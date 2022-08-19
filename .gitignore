@@ -133,3 +133,12 @@ dmypy.json
 
 # Overpass query files
 *.opq
+
+# OpenStreetMap files
+*.osm
+
+# GeoJson files
+*.geojson
+
+# Ignore folder examples
+examples

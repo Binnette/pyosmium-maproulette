@@ -18,7 +18,7 @@ class DiscouragedOnewayValuesHandler(o.SimpleHandler):
     def print_overpass_header(self):
         print("[out:json];")
         print("// Start of Overpass query")
-        print("(")
+        print("(", flush=True)
 
     def print_overpass_footer(self):
         print(");")
@@ -32,10 +32,13 @@ class DiscouragedOnewayValuesHandler(o.SimpleHandler):
         print("  [oneway!=reversible]")
         print("  [oneway!=alternating];")
         print("// End of Overpass query")
-        print("out body geom;")
+        print("out meta geom;", flush=True)
 
     def print_way(self, id, val):
-        print("  way(%s); // oneway=%s" % (id, val))
+        try:
+            print("  way(%s); // oneway=%s" % (id, val), flush=True)
+        except:
+            print("  way(%s);" % id, flush=True)
 
     def way(self, w):
         if 'oneway' in w.tags:
