@@ -1,0 +1,17 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python : fichier actif",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["-i", "planet-220808.osm.pbf" ], //"isere.osm.pbf"
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
