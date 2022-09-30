@@ -1,16 +1,14 @@
 """
-Return a list of parking space that are too big
-They should be converted as parking lot
+Return a list of parking without surface
 
-Stats for planet-220818.osm.pbf
--Ways found: 36224
--Program ended in 01:18:40.64
+Stats for planet-220815.osm.pbf
+-Ways found: 8332
+-Program ended in 01:02:44.54
 
 Once done, open the osm file with JOSM and "update the data" to download all nodes
 Then create a new layer and select all object from the other layer
-Then do "Merge selection". It allows us to ignore ways/nodes deleted on server
-Then Ctrl+F in mode "select" with filter: type:way amenity=parking_space -capacity:
-Then Ctrl+F in mode "remove" with filter: areasize:-30
+Then do "Merge selection" (it allows us to ignore ways/nodes deleted on server)
+Then Ctrl+F in mode "select" with filter: type:way amenity=parking -parking:
 It will select all parking_space with area > 30m²
 Edit those object replace amenity value from parking_space to parking
 Save in a new osm file
@@ -24,26 +22,28 @@ import getopt
 import time
 
 
-class BigParkingSpaceHandler(osmium.SimpleHandler):
+class ParkingSurfaceHandler(osmium.SimpleHandler):
 
     def __init__(self, writer):
-        super(BigParkingSpaceHandler, self).__init__()
+        super(ParkingSurfaceHandler, self).__init__()
         self.writer = writer  # osmium writer
         self.nbWay = 0  # counter ways
         self.firstWayRead = False
+        self.ignoreAccess = ['private', 'no']
 
     # osmium way handler
     def way(self, w):
         if self.firstWayRead == False:
             print("First way read!")
             self.firstWayRead = True
-        if w.tags.get('amenity') == 'parking_space':
-            if 'capacity' not in w.tags:
-                if w.nodes.__len__() > 5:
-                    self.nbWay += 1  # increment counter
-                    self.writer.add_way(w)
-                    sys.stdout.write("\rWays found: %i" % self.nbWay)
-                    sys.stdout.flush()
+        if w.tags.get('amenity') == 'parking':
+            if 'parking' not in w.tags:
+                if w.tags.get('access') not in self.ignoreAccess:
+                    if w.nodes.__len__() > 10:
+                        self.nbWay += 1  # increment counter
+                        self.writer.add_way(w)
+                        sys.stdout.write("\rWays found: %i" % self.nbWay)
+                        sys.stdout.flush()
 
 
 def print_help():
@@ -63,12 +63,12 @@ def main(input, output):
     try:
         start = time.time()
         if os.path.exists(output):
-        	print("Delete file %s" % output)
-        	os.remove(output)
+            print("Delete file %s" % output)
+            os.remove(output)
         print("Initialize writer", flush=True)
         writer = osmium.SimpleWriter(output)
         print("Initialize handler", flush=True)
-        handler = BigParkingSpaceHandler(writer)
+        handler = ParkingSurfaceHandler(writer)
         print("Start handler...", flush=True)
         handler.apply_file(input, locations=False)
         writer.close()
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     # default arguments values
     input = ""
-    output = "big-parking-space.osm"
+    output = "parking-surface.osm"
 
     # parse arguments
     opts, args = getopt.getopt(sys.argv[1:], "i:o", ["input =", "output ="])
