@@ -37,13 +37,33 @@ class BigParkingSpaceHandler(osmium.SimpleHandler):
         if self.firstWayRead == False:
             print("First way read!")
             self.firstWayRead = True
+
+        # search only for parking_space
         if w.tags.get('amenity') == 'parking_space':
-            if 'capacity' not in w.tags:
-                if w.nodes.__len__() > 5:
-                    self.nbWay += 1  # increment counter
-                    self.writer.add_way(w)
-                    sys.stdout.write("\rWays found: %i" % self.nbWay)
-                    sys.stdout.flush()
+            # ignore parking_space with capacity
+            if 'capacity' in w.tags:
+                return
+
+            # ignore parking_space with less than 5 nodes
+            if w.nodes.__len__() < 5:
+                return
+
+            # ignore bus parking_space
+            if 'bus' in w.tags:
+                return
+
+            # ignore disabled patking_space
+            if w.tags.get('parking_space') == 'disabled':
+                return
+
+            if 'wheelchair' in w.tags:
+                return
+
+            # all filter passed, adding the parking_space to osm file
+            self.nbWay += 1  # increment counter
+            self.writer.add_way(w)
+            sys.stdout.write("\rWays found: %i" % self.nbWay)
+            sys.stdout.flush()
 
 
 def print_help():

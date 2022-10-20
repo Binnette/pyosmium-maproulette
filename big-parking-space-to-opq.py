@@ -15,7 +15,7 @@ import shapely.wkb as wkblib
 
 wkbfab = osmium.geom.WKBFactory()
 
-class DiscouragedOnewayValuesHandler(osmium.SimpleHandler):
+class BigParkingSpaceHandler(osmium.SimpleHandler):
     # output file
     out: TextIOWrapper
     # total ways for stats
@@ -24,7 +24,7 @@ class DiscouragedOnewayValuesHandler(osmium.SimpleHandler):
     withFile = True
 
     def __init__(self, withFile, outFileName):
-        super(DiscouragedOnewayValuesHandler, self).__init__()
+        super(BigParkingSpaceHandler, self).__init__()
         self.withFile = withFile
         if self.withFile:
             self.out = open(outFileName, "w")
@@ -125,7 +125,7 @@ class DiscouragedOnewayValuesHandler(osmium.SimpleHandler):
 
 def main(input, withFile, output):
     osmium.make_simple_handler()
-    handler = DiscouragedOnewayValuesHandler(withFile, output)
+    handler = BigParkingSpaceHandler(withFile, output)
     handler.apply_file(input, locations=False)
     return 0
 

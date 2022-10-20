@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["-i", "planet-220815.osm.pbf" ], //"isere.osm.pbf"
+            "args": ["-i", "planet-221010.osm.pbf" ], //"isere.osm.pbf"
             "console": "integratedTerminal",
             "justMyCode": true
         }
