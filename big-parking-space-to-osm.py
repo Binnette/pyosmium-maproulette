@@ -6,16 +6,24 @@ Stats for planet-220818.osm.pbf
 -Ways found: 36224
 -Program ended in 01:18:40.64
 
-Once done, open the osm file with JOSM and "update the data" to download all nodes
-Then create a new layer and select all object from the other layer
-Then do "Merge selection". It allows us to ignore ways/nodes deleted on server
-Then Ctrl+F in mode "select" with filter: type:way amenity=parking_space -capacity:
-Then Ctrl+F in mode "remove" with filter: areasize:-30
-It will select all parking_space with area > 30m²
-Edit those object replace amenity value from parking_space to parking
-Save in a new osm file
-Then use the following command (mr-cli)
-mr coop tag --out parking_space.geojson .\big-parking-space.osm
+Stats for planet-221010.osm.pbf
+-Ways found: 33121
+-Program ended in 01:11:30.79
+
+Once python script id completed:
+1. Open the OSM file in JOSM
+2. In "File" menu, click "Update the data" to download all nodes and refresh data
+3. Create a new layer
+4. Select all data with Ctrl+A
+5. Do "Merge selection" in the new layer (Ctrl+Maj+M). It allows us to ignore ways/nodes deleted on server
+6. Ctrl+F in mode "select" with filter:
+        type:way amenity=parking_space -aeroway -bicycle -bus -capacity -disabled -emergency -footway -hgv -hov
+7. Ctrl+F in mode "remove" with filter (it will select all parking_space with area > 500m²):
+        areasize:-500
+8. Edit those object replace amenity value from parking_space to parking
+9. Save in a new osm file
+10. Use the following command (mr-cli):
+        mr coop tag --out parking_space.geojson big-parking-space.osm
 """
 import os
 import osmium
@@ -38,32 +46,55 @@ class BigParkingSpaceHandler(osmium.SimpleHandler):
             print("First way read!")
             self.firstWayRead = True
 
+
         # search only for parking_space
-        if w.tags.get('amenity') == 'parking_space':
-            # ignore parking_space with capacity
-            if 'capacity' in w.tags:
-                return
+        if w.tags.get('amenity') != 'parking_space':
+            return
 
-            # ignore parking_space with less than 5 nodes
-            if w.nodes.__len__() < 5:
-                return
+        # ignore parking_space with less than 5 nodes
+        if w.nodes.__len__() <= 5:
+            return
 
-            # ignore bus parking_space
-            if 'bus' in w.tags:
-                return
+        # ignore aeroway
+        if 'aeroway' in w.tags:
+            return
 
-            # ignore disabled patking_space
-            if w.tags.get('parking_space') == 'disabled':
-                return
+        # ignore bicycle
+        if 'bicycle' in w.tags:
+            return
 
-            if 'wheelchair' in w.tags:
-                return
+        # ignore bus
+        if 'bus' in w.tags:
+            return
 
-            # all filter passed, adding the parking_space to osm file
-            self.nbWay += 1  # increment counter
-            self.writer.add_way(w)
-            sys.stdout.write("\rWays found: %i" % self.nbWay)
-            sys.stdout.flush()
+        # ignore parking_space with capacity
+        if 'capacity' in w.tags:
+            return
+
+        # ignore capacity:disabled
+        if 'capacity:disabled' in w.tags:
+            return
+
+        # ignore parking_space with tag 'disabled'
+        if 'disabled' in w.tags:
+            return
+
+        # ignore parking_space with tag 'disabled'
+        if 'emergency' in w.tags:
+            return
+
+        # ignore disabled patking_space
+        if w.tags.get('parking_space') == 'disabled':
+            return
+
+        if 'wheelchair' in w.tags:
+            return
+
+        # all filter passed, adding the parking_space to osm file
+        self.nbWay += 1  # increment counter
+        self.writer.add_way(w)
+        sys.stdout.write("\rWays found: %i" % self.nbWay)
+        sys.stdout.flush()
 
 
 def print_help():
