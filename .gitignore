@@ -143,5 +143,8 @@ dmypy.json
 # Ignore folder examples
 examples
 
+# Ignore folder in
+in
+
 # Ignore torrent files
 *.torrent

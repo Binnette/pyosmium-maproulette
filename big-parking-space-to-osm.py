@@ -46,7 +46,6 @@ class BigParkingSpaceHandler(osmium.SimpleHandler):
             print("First way read!")
             self.firstWayRead = True
 
-
         # search only for parking_space
         if w.tags.get('amenity') != 'parking_space':
             return
@@ -114,8 +113,8 @@ def main(input, output):
     try:
         start = time.time()
         if os.path.exists(output):
-        	print("Delete file %s" % output)
-        	os.remove(output)
+            print("Delete file %s" % output)
+            os.remove(output)
         print("Initialize writer", flush=True)
         writer = osmium.SimpleWriter(output)
         print("Initialize handler", flush=True)

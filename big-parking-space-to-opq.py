@@ -15,6 +15,7 @@ import shapely.wkb as wkblib
 
 wkbfab = osmium.geom.WKBFactory()
 
+
 class BigParkingSpaceHandler(osmium.SimpleHandler):
     # output file
     out: TextIOWrapper
@@ -83,7 +84,8 @@ class BigParkingSpaceHandler(osmium.SimpleHandler):
     def getlen(self, w):
         length = 0
         try:
-            wkb = wkbfab.create_linestring(w, use_nodes=osmium.geom.use_nodes.UNIQUE)
+            wkb = wkbfab.create_linestring(
+                w, use_nodes=osmium.geom.use_nodes.UNIQUE)
             line = wkblib.loads(wkb, hex=True)
             length = line.length
         except Exception:
@@ -98,14 +100,14 @@ class BigParkingSpaceHandler(osmium.SimpleHandler):
             length = -2
 
         return length
-        
 
     # osmium way handler
+
     def way(self, w):
         osmium.make_simple_handler
         if w.tags.get('amenity') == 'parking_space':
             if 'capacity' not in w.tags:
-                self.nbWay += 1 # increment counter
+                self.nbWay += 1  # increment counter
                 self.write_area(w.id, -1)
 
     # osmium area handler
@@ -115,13 +117,14 @@ class BigParkingSpaceHandler(osmium.SimpleHandler):
             if 'capacity' not in a.tags:
                 try:
                     wkb = wkbfab.create_multipolygon(a)
-                    poly = wkblib.loads(wkb, hex=True)              
-                    len = poly.length * 100000               
+                    poly = wkblib.loads(wkb, hex=True)
+                    len = poly.length * 100000
                 except:
                     len = -1
                 if poly.length > 100:
-                    self.nbWay += 1 # increment counter
+                    self.nbWay += 1  # increment counter
                     self.write_area(a.orig_id(), len)
+
 
 def main(input, withFile, output):
     osmium.make_simple_handler()
@@ -129,8 +132,10 @@ def main(input, withFile, output):
     handler.apply_file(input, locations=False)
     return 0
 
+
 def print_help():
-    print("Usage: python %s -i <osmfile> -o <output filename.opq>" % sys.argv[0])
+    print("Usage: python %s -i <osmfile> -o <output filename.opq>" %
+          sys.argv[0])
     print("")
     print("Read the <osmfile> in input. Find the parking space that are too big.")
     print("Write an Overpass query in the <output filename.opq> that get osm elements (opq stands for Overpass Query")
@@ -139,6 +144,7 @@ def print_help():
     print("  -i <input osm file> such as planet.osm.pbf. All file supported by osmium should work")
     print("  -o <output filename.opq>. A file to write the Overpass query inside")
     print("", flush=True)
+
 
 if __name__ == '__main__':
     nbArgs = len(sys.argv)
@@ -153,10 +159,12 @@ if __name__ == '__main__':
     # parse arguments
     opts, args = getopt.getopt(sys.argv[1:], "i:o", ["input =", "output ="])
     for k, v in opts:
-        if k == "-i": input = v
-        if k == "-o": output = v
-   
-    print("Args: input=%s ; output=%s" % (input,output), flush=True)
+        if k == "-i":
+            input = v
+        if k == "-o":
+            output = v
+
+    print("Args: input=%s ; output=%s" % (input, output), flush=True)
 
     if input == "":
         print_help()
@@ -173,5 +181,6 @@ if __name__ == '__main__':
     end = time.time()
     hours, rem = divmod(end-start, 3600)
     minutes, seconds = divmod(rem, 60)
-    print("Program ended in {:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds), flush=True)
+    print("Program ended in {:0>2}:{:0>2}:{:05.2f}".format(
+        int(hours), int(minutes), seconds), flush=True)
     sys.exit(ret)
