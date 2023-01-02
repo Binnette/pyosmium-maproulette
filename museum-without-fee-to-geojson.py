@@ -1,10 +1,10 @@
 """
-This script store place of worship without relegion in a osm file.
+This script store museum without fee in a osm file.
 
 1. Run the script
 2. Open the osm file with JOSM
 3. Update data
-4. Ctrl+F with filter amenity=place_of_worship -religion
+4. Ctrl+F with filter tourism=museum -fee
 5. Create a new layer
 6. Merge selection to new layer(Ctrl+Shift+M)
 7. save the new layer as geojson
@@ -21,16 +21,16 @@ import getopt
 import time
 
 
-class PlaceOfWorshipWithoutReligion(osmium.SimpleHandler):
+class MuseumWithoutFee(osmium.SimpleHandler):
 
     def __init__(self, writer):
-        super(PlaceOfWorshipWithoutReligion, self).__init__()
+        super(MuseumWithoutFee, self).__init__()
         self.writer = writer  # osmium writer
         self.nbWay = 0  # counter ways
         self.nbNode = 0  # counter nodes
 
     def isConcerned(self, obj):
-        return obj.tags.get('amenity') == 'place_of_worship' and 'religion' not in obj.tags
+        return obj.tags.get('tourism') == 'museum' and 'fee' not in obj.tags
 
     # osmium way handler
     def node(self, n):
@@ -62,11 +62,11 @@ class PlaceOfWorshipWithoutReligion(osmium.SimpleHandler):
 def print_help():
     print("Usage: python %s -i <osmfile> -o <output.geojson>" % sys.argv[0])
     print("")
-    print("Read the <osmfile> in input. Find place of worship without religion. Write a geojson file.")
+    print("Read the <osmfile> in input. Write a geojson file of found objects.")
     print("Use this geojson to create a MapRoulette challenge.")
     print("")
     print("  -i <input osm file> such as planet.osm.pbf. All file supported by osmium should work")
-    print("  -o <output filename.geojson>. A file to write the Overpass query inside")
+    print("  -o <output filename.geojson>. A file containing found objects")
     print("", flush=True)
     exit()
 
@@ -80,7 +80,7 @@ def main(input, output):
         print("Initialize writer", flush=True)
         writer = osmium.SimpleWriter(output)
         print("Initialize handler", flush=True)
-        handler = PlaceOfWorshipWithoutReligion(writer)
+        handler = MuseumWithoutFee(writer)
         print("Start handler...", flush=True)
         handler.apply_file(input, locations=False)
         writer.close()
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
     # default arguments values
     input = ""
-    output = "out/place-of-worship.osm"
+    output = "out/museum.osm"
 
     # parse arguments
     opts, args = getopt.getopt(sys.argv[1:], "i:o", ["input =", "output ="])

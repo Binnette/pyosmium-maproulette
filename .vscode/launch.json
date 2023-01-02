@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["-i", "in/planet-221017.osm.pbf"], // france.osm.pbf, isere.osm.pbf, planet-221010.osm.pbf
+            "args": ["-i", "in/planet-221226.osm.pbf"], // france.osm.pbf, isere.osm.pbf, planet-221010.osm.pbf
             "console": "integratedTerminal",
             "justMyCode": true
         }
