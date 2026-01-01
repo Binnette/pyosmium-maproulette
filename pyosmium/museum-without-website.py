@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-This script store place of worship without relegion in a osm file.
+Extract museums without website from an input file (PBF, etc).
 
 1. Run the script
 2. Open the osm file with JOSM

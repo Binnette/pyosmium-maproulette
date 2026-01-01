@@ -1,0 +1,95 @@
+name: Update MapRoulette challenges
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-mr-challenges:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name : Space Before Clean Up
+        run: df -h
+
+      - name: Free Disk Space
+        uses: endersonmenezes/free-disk-space@v3
+        with:
+          remove_android: true
+          remove_dotnet: true
+          remove_haskell: true
+          remove_tool_cache: true
+          remove_swap: true
+          remove_packages: "azure-cli google-cloud-cli microsoft-edge-stable google-chrome-stable firefox postgresql* *llvm* mysql* dotnet-sdk-*"
+          remove_packages_one_command: true
+          remove_folders: "/usr/share/swift /usr/share/miniconda /usr/share/az* /usr/local/lib/node_modules /usr/local/share/chromium /usr/local/share/powershell /usr/local/julia /usr/local/aws-cli /usr/local/aws-sam-cli /usr/share/gradle"
+          rm_cmd: "rmz"  # Use 'rmz' for faster deletion (default: 'rm')
+          rmz_version: "3.1.1"  # Required when rm_cmd is 'rmz'
+          testing: false
+
+      - name : Space After Clean Up
+        run: df -h
+
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Run setup script
+        run: bash 00-setup.sh
+
+      - name : Space After Setup
+        run: df -h
+
+      - name: Run script museum-no-fee
+        run: bash 01-museum-no-fee.sh
+
+      - name: Run script museum-no-website
+        run: bash 02-museum-no-website.sh
+
+      - name: Run script oneway-discouraged-values
+        run: bash 03-oneway-discouraged-values.sh
+
+      - name: Run script place-of-worship-no-religion
+        run: bash 04-place-of-worship-no-religion.sh
+
+      - name: Run script shop-no-category
+        run: bash 05-shop-no-category.sh
+
+      - name: Commit out files
+        uses: stefanzweifel/git-auto-commit-action@v7
+
+      - name: Rebuild MapRoulette challenge museum-no-fee
+        run: |
+          curl -X PUT \
+            "https://maproulette.org/api/v2/challenge/53974/rebuild?removeUnmatched=true&skipSnapshot=false" \
+            -H "accept: */*" \
+            -H "apiKey: ${{ secrets.MR_API_KEY }}"
+
+      - name: Rebuild MapRoulette challenge museum-no-website
+        run: |
+          curl -X PUT \
+            "https://maproulette.org/api/v2/challenge/53990/rebuild?removeUnmatched=true&skipSnapshot=false" \
+            -H "accept: */*" \
+            -H "apiKey: ${{ secrets.MR_API_KEY }}"
+
+      - name: Rebuild MapRoulette challenge oneway-discouraged-values
+        run: |
+          curl -X PUT \
+            "https://maproulette.org/api/v2/challenge/53991/rebuild?removeUnmatched=true&skipSnapshot=false" \
+            -H "accept: */*" \
+            -H "apiKey: ${{ secrets.MR_API_KEY }}"
+
+      - name: Rebuild MapRoulette challenge place-of-worship-no-religion
+        run: |
+          curl -X PUT \
+            "https://maproulette.org/api/v2/challenge/53992/rebuild?removeUnmatched=true&skipSnapshot=false" \
+            -H "accept: */*" \
+            -H "apiKey: ${{ secrets.MR_API_KEY }}"
+
+      - name: Rebuild MapRoulette challenge shop-no-category
+        run: |
+          curl -X PUT \
+            "https://maproulette.org/api/v2/challenge/54047/rebuild?removeUnmatched=true&skipSnapshot=false" \
+            -H "accept: */*" \
+            -H "apiKey: ${{ secrets.MR_API_KEY }}"
